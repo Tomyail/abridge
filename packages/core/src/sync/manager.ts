@@ -39,9 +39,17 @@ export class SyncManager {
       version: '1.0.0',
     };
 
-    // Copy local config to cloud
-    const localContent = await Bun.file(this.localConfigPath).text();
-    await Bun.write(targetFile, localContent);
+    // Load config and remove device-specific sync.path before pushing
+    const { stringify } = await import('yaml');
+    const configForCloud = { ...config };
+    if (configForCloud.sync) {
+      // Remove device-specific path from sync config
+      const { path, ...syncWithoutPath } = configForCloud.sync;
+      configForCloud.sync = syncWithoutPath;
+    }
+    const cloudContent = stringify(configForCloud);
+
+    await Bun.write(targetFile, cloudContent);
     await Bun.write(metadataFile, JSON.stringify(metadata, null, 2));
   }
 
@@ -62,9 +70,20 @@ export class SyncManager {
       return false;
     }
 
-    // Pull logic: overwriting local for now (MVP)
+    // Preserve local sync.path
+    const localSyncPath = config.sync.path;
+
+    // Parse cloud config and merge with local sync.path
+    const { parse, stringify } = await import('yaml');
     const cloudContent = await Bun.file(cloudFile).text();
-    await Bun.write(this.localConfigPath, cloudContent);
+    const cloudConfig = parse(cloudContent);
+
+    // Restore device-specific sync.path
+    if (cloudConfig.sync && localSyncPath) {
+      cloudConfig.sync.path = localSyncPath;
+    }
+
+    await Bun.write(this.localConfigPath, stringify(cloudConfig));
     return true;
   }
 

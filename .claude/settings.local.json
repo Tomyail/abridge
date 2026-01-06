@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(rm:*)",
-      "Bash(bun test-validation.ts)"
+      "Bash(bun test-validation.ts)",
+      "Bash(git commit:*)"
     ]
   }
 }
