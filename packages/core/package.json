@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "hono": "^4.0.0",
+    "smol-toml": "^1.6.0",
     "yaml": "^2.8.2",
     "zod": "^3.0.0"
   }
