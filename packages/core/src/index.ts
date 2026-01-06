@@ -4,3 +4,4 @@ export * from './config/loader';
 export * from './config/schema';
 export * from './config/merger';
 export * from './adapters';
+export * from './sync/manager';
