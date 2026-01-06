@@ -1,8 +1,8 @@
-# Abridge 🌉
+# Abridge (Agent Bridge) 🌉
 
 [中文版](./README.zh-CN.md)
 
-**Abridge** is a unified configuration management platform designed for developers using multiple Coding Agents. It acts as a bridge between various terminal-based AI agents (such as Claude Code, Codex, Gemini CLI, etc.), allowing you to centrally manage all your MCP (Model Context Protocol) server configurations, skills, and session records.
+**Abridge** (short for **Agent Bridge**) is a unified configuration management platform designed for developers using multiple Coding Agents. It acts as a bridge between various terminal-based AI agents (such as Claude Code, Codex, Gemini CLI, etc.), allowing you to centrally manage all your MCP (Model Context Protocol) server configurations, skills, and session records.
 
 ## 🌟 Key Features
 

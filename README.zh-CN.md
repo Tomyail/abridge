@@ -1,8 +1,8 @@
-# Abridge 🌉
+# Abridge (Agent Bridge) 🌉
 
 [English](./README.md)
 
-**Abridge** 是一个专为开发者打造的统一 Coding Agents 配置管理平台。它充当了不同终端编程代理（如 Claude Code, Codex, Gemini CLI 等）之间的桥梁，让你能够在一个地方统一管理所有的 MCP 服务器配置、技能（Skills）和会话记录。
+**Abridge** (取自 **Agent Bridge**) 是一个专为开发者打造的统一 Coding Agents 配置管理平台。它充当了不同终端编程代理（如 Claude Code, Codex, Gemini CLI 等）之间的桥梁，让你能够在一个地方统一管理所有的 MCP 服务器配置、技能（Skills）和会话记录。
 
 ## 🌟 核心特性
 
