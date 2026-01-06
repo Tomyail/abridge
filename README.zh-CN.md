@@ -11,9 +11,10 @@
 - **工具支持**：
   - ✅ **Claude Code** (支持最新的 `.claude.json` 单体配置格式)
   - ✅ **Codex** (支持 `.codex/config.toml` 配置格式)
-  - ✅ **OpenCode** (支持 `~/.config/opencode/opencode.json` 配置格式)
-  - ✅ **Antigravity** (支持 `~/.gemini/antigravity/mcp_config.json` 配置格式)
-  - 🏗️ **Gemini CLI / Cursor** (开发中)
+  - ✅ **OpenCode** (支持 `~/.config/opencode/opencode.json` 格式)
+  - ✅ **Antigravity** (支持 `~/.gemini/antigravity/mcp_config.json` 格式)
+  - ✅ **Gemini CLI** (支持 `~/.gemini/settings.json` 格式)
+  - 🏗️ **Cursor** (即将推出)
 - **高性能运行时**：基于 [Bun](https://bun.sh/) 开发，响应极快。
 - **本地优先**：所有配置和数据均保存在本地，保护隐私。
 
