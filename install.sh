@@ -4,7 +4,9 @@ set -e
 
 # Configuration
 REPO="Tomyail/abridge"
-INSTALL_DIR="/usr/local/bin"
+APP_NAME="abridge"
+INSTALL_ROOT="$HOME/.abridge"
+BIN_DIR="$INSTALL_ROOT/bin"
 BINARY_NAME="abridge"
 
 # Colors
@@ -13,7 +15,6 @@ red="\033[31m"
 green="\033[32m"
 yellow="\033[33m"
 blue="\033[34m"
-magenta="\033[35m"
 cyan="\033[36m"
 
 info() { echo -e "${blue}info${reset} $1"; }
@@ -53,23 +54,52 @@ fi
 
 DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${ASSET_NAME}"
 
+# Create directories
+mkdir -p "$BIN_DIR"
+
 info "Downloading ${VERSION} from ${DOWNLOAD_URL}..."
-TMP_DIR=$(mktemp -d)
-curl -L -o "${TMP_DIR}/${BINARY_NAME}" "${DOWNLOAD_URL}"
+TMP_FILE=$(mktemp)
+curl -L -o "$TMP_FILE" "$DOWNLOAD_URL"
 
 # Install
-info "Installing to ${INSTALL_DIR}/${BINARY_NAME}..."
-chmod +x "${TMP_DIR}/${BINARY_NAME}"
+info "Installing to ${BIN_DIR}/${BINARY_NAME}..."
+chmod +x "$TMP_FILE"
+mv "$TMP_FILE" "${BIN_DIR}/${BINARY_NAME}"
 
-# Move to destination (may require sudo)
-if [ -w "$INSTALL_DIR" ]; then
-  mv "${TMP_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
-else
-  warn "Permission denied for ${INSTALL_DIR}. Using sudo..."
-  sudo mv "${TMP_DIR}/${BINARY_NAME}" "${INSTALL_DIR}/${BINARY_NAME}"
+# Shell Profile Update Logic
+update_shell_profile() {
+  local shell_profile=$1
+  if [ -f "$shell_profile" ]; then
+    if ! grep -q "$BIN_DIR" "$shell_profile"; then
+      info "Adding $BIN_DIR to PATH in $shell_profile"
+      echo "" >> "$shell_profile"
+      echo "# Abridge CLI" >> "$shell_profile"
+      echo "export PATH=\"$BIN_DIR:\$PATH\"" >> "$shell_profile"
+      return 0
+    fi
+  fi
+  return 1
+}
+
+# Try updating common profiles
+SHELL_UPDATED=false
+if [[ "$SHELL" == */zsh ]]; then
+  update_shell_profile "$HOME/.zshrc" && SHELL_UPDATED=true
+elif [[ "$SHELL" == */bash ]]; then
+  update_shell_profile "$HOME/.bashrc" && SHELL_UPDATED=true
+  update_shell_profile "$HOME/.bash_profile" && SHELL_UPDATED=true
 fi
 
-rm -rf "${TMP_DIR}"
-
 success "Abridge ${VERSION} installed successfully!"
-echo -e "Try running: ${cyan}abridge --help${reset}"
+echo -e "\n${cyan}Location:${reset} ${BIN_DIR}/${BINARY_NAME}"
+
+if [ "$SHELL_UPDATED" = true ]; then
+  echo -e "${yellow}Please restart your terminal or run:${reset} source <your_shell_profile>"
+else
+  if ! [[ ":$PATH:" == *":$BIN_DIR:"* ]]; then
+    warn "Binary path is not in your PATH. Please add it manually:"
+    echo -e "  export PATH=\"$BIN_DIR:\$PATH\""
+  fi
+fi
+
+echo -e "\nTry running: ${cyan}abridge --help${reset}"
