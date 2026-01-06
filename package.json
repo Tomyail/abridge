@@ -5,7 +5,9 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "bun run --cwd packages/cli src/index.ts"
+    "dev": "bun run --cwd packages/cli src/index.ts",
+    "web:dev": "bun --cwd packages/web run dev",
+    "web:build": "bun --cwd packages/web run build"
   },
   "devDependencies": {
     "@types/bun": "latest",
