@@ -14,10 +14,9 @@ program
   .command('init')
   .description('Initialize abridge configuration')
   .action(async () => {
-    console.log(chalk.blue(`Checking configuration at ${DEFAULT_CONFIG_PATH}...`));
+    console.log(chalk.blue(`Initializing configuration at ${DEFAULT_CONFIG_PATH}...`));
     try {
-      const config = await ConfigLoader.load();
-      await ConfigLoader.save(config);
+      await ConfigLoader.init();
       console.log(chalk.green('✓ Configuration initialized successfully.'));
     } catch (error) {
       console.error(chalk.red('Failed to initialize configuration:'), error);
