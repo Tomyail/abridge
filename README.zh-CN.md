@@ -20,7 +20,12 @@
 ## 🚀 快速上手
 
 ### 安装
-#### 从 GitHub Releases 下载 (推荐)
+#### 一键安装 (推荐)
+```bash
+curl -fsSL https://raw.githubusercontent.com/lixuexin03/abridge/main/install.sh | bash
+```
+
+#### 从 GitHub Releases 下载
 从 [Releases](https://github.com/your-username/abridge/releases) 页面下载对应平台的预编译二进制文件：
 - `abridge-macos-arm64` (Apple Silicon Mac)
 - `abridge-macos-x64` (Intel Mac)

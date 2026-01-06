@@ -21,7 +21,12 @@
 
 ### Installation
 
-#### From GitHub Releases (Recommended)
+#### One-Line Install (Recommended)
+```bash
+curl -fsSL https://raw.githubusercontent.com/lixuexin03/abridge/main/install.sh | bash
+```
+
+#### From GitHub Releases
 Download the pre-compiled binary for your platform from the [Releases](https://github.com/your-username/abridge/releases) page:
 - `abridge-macos-arm64` (Apple Silicon)
 - `abridge-macos-x64` (Intel Mac)
