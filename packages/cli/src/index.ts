@@ -24,4 +24,58 @@ program
     }
   });
 
+import { registry, mergeConfigs } from '@abridge/core';
+
+program
+  .command('apply')
+  .description('Apply configuration to all tools')
+  .action(async () => {
+    try {
+      const config = await ConfigLoader.load();
+      const adapters = registry.getAllAdapters();
+      
+      console.log(chalk.blue('Applying configuration to tools...'));
+      
+      for (const adapter of adapters) {
+        if (await adapter.detect()) {
+          console.log(chalk.yellow(`- Applying to ${adapter.name}...`));
+          await adapter.apply(config);
+          console.log(chalk.green(`  ✓ ${adapter.name} updated.`));
+        } else {
+          console.log(chalk.gray(`- ${adapter.name} not detected, skipping.`));
+        }
+      }
+      
+      console.log(chalk.green('✓ Configuration applied successfully.'));
+    } catch (error) {
+      console.error(chalk.red('Failed to apply configuration:'), error);
+    }
+  });
+
+program
+  .command('import')
+  .description('Import configuration from all detected tools')
+  .action(async () => {
+    try {
+      let config = await ConfigLoader.load();
+      const adapters = registry.getAllAdapters();
+      
+      console.log(chalk.blue('Importing configuration from tools...'));
+      
+      for (const adapter of adapters) {
+        if (await adapter.detect()) {
+          console.log(chalk.yellow(`- Importing from ${adapter.name}...`));
+          const extracted = await adapter.extract();
+          config = mergeConfigs(config, extracted);
+          console.log(chalk.green(`  ✓ ${adapter.name} data merged.`));
+        }
+      }
+      
+      await ConfigLoader.save(config);
+      console.log(chalk.green('✓ Configuration imported and saved.'));
+    } catch (error) {
+      console.error(chalk.red('Failed to import configuration:'), error);
+    }
+  });
+
 program.parse();

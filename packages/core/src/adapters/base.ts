@@ -18,4 +18,9 @@ export interface ToolAdapter {
    * Detects if the tool is installed on the system.
    */
   detect(): Promise<boolean>;
+
+  /**
+   * Extracts current configuration from the tool and converts it to partial unified config.
+   */
+  extract(): Promise<Partial<UnifiedConfig>>;
 }
