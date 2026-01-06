@@ -1,50 +1,101 @@
 #!/usr/bin/env bun
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { render, Box, Text, Newline, useInput } from 'ink';
+import TextInput from 'ink-text-input';
+import { runInit, runApply, runImport, runStatus, runSyncPush, runSyncPull } from './actions.js';
+
+const COMMANDS = [
+  { cmd: 'init', desc: 'Initialize configuration' },
+  { cmd: 'import', desc: 'Import from tools' },
+  { cmd: 'apply', desc: 'Apply configuration' },
+  { cmd: 'status', desc: 'Check sync status' },
+  { cmd: 'push', desc: 'Push to cloud' },
+  { cmd: 'pull', desc: 'Pull from cloud' },
+  { cmd: 'help', desc: 'Show help' },
+  { cmd: 'exit', desc: 'Exit' },
+];
 
 const WelcomeScreen = () => {
-  const [selected, setSelected] = useState(0);
+  const [query, setQuery] = useState('');
+  const [suggestionIndex, setSuggestionIndex] = useState(0);
+
+  const suggestions = query.startsWith('/')
+    ? COMMANDS.filter((c) => c.cmd.startsWith(query.slice(1)))
+    : [];
 
   useInput((input, key) => {
-    if (key.upArrow) {
-      setSelected((prev) => (prev > 0 ? prev - 1 : prev));
-    } else if (key.downArrow) {
-      setSelected((prev) => (prev < 4 ? prev + 1 : prev));
-    } else if (key.return) {
-      handleSelection(selected);
+    if (key.escape) {
       process.exit(0);
-    } else if (key.escape || input === 'q') {
-      process.exit(0);
+    }
+
+    if (key.tab && suggestions.length > 0) {
+      const currentSuggestion = suggestions[suggestionIndex];
+      if (currentSuggestion) {
+        setQuery('/' + currentSuggestion.cmd);
+        setSuggestionIndex((suggestionIndex + 1) % suggestions.length);
+      }
+    }
+
+    if (key.upArrow && suggestions.length > 0) {
+      setSuggestionIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
+    }
+
+    if (key.downArrow && suggestions.length > 0) {
+      setSuggestionIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
     }
   });
 
-  const handleSelection = (index: number) => {
-    switch (index) {
-      case 0:
-        console.log('\nRunning: abridge init\n');
-        break;
-      case 1:
-        console.log('\nRunning: abridge import\n');
-        break;
-      case 2:
-        console.log('\nRunning: abridge apply\n');
-        break;
-      case 3:
-        console.log('\nRunning: abridge sync status\n');
-        break;
-      case 4:
-        console.log('\nExiting...\n');
-        break;
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    setSuggestionIndex(0);
+  };
+
+  const handleSubmit = async (value: string) => {
+    const command = value.trim().toLowerCase();
+    
+    if (command === '/exit' || command === '/quit') {
+      process.exit(0);
+    }
+
+    if (command.startsWith('/')) {
+      await handleCommand(command.slice(1));
+    } else if (command.length > 0) {
+      setQuery('');
     }
   };
 
-  const options = [
-    { label: 'Initialize configuration', cmd: 'init' },
-    { label: 'Import from tools', cmd: 'import' },
-    { label: 'Apply configuration', cmd: 'apply' },
-    { label: 'Check sync status', cmd: 'sync status' },
-    { label: 'Exit', cmd: '' },
-  ];
+
+  const handleCommand = async (cmd: string) => {
+    switch (cmd) {
+      case 'init':
+        await runInit();
+        break;
+      case 'import':
+        await runImport();
+        break;
+      case 'apply':
+        await runApply();
+        break;
+      case 'status':
+        await runStatus();
+        break;
+      case 'push':
+        await runSyncPush();
+        break;
+      case 'pull':
+        await runSyncPull();
+        break;
+      case 'help':
+        console.log('\nAvailable commands: /init, /import, /apply, /status, /push, /pull, /help, /exit\n');
+        break;
+      default:
+        console.log(`\nUnknown command: /${cmd}. Type /help for available commands.\n`);
+        break;
+    }
+    setQuery('');
+  };
+
+
 
   return (
     <Box flexDirection="column" paddingX={2}>
@@ -75,25 +126,40 @@ const WelcomeScreen = () => {
         </Text>
       </Box>
       <Newline />
-      <Box marginBottom={1}>
-        <Text bold color="yellow">Select an action:</Text>
-      </Box>
-      <Newline />
-      {options.map((option, index) => (
-        <Box key={index}>
-          <Text
-            color={selected === index ? 'green' : 'white'}
-            bold={selected === index}
-          >
-            {selected === index ? '▸ ' : '  '}
-            {index + 1}. {option.label}
-          </Text>
+      
+      <Box borderStyle="round" paddingX={1} borderColor="green">
+        <Box marginRight={1}>
+          <Text bold color="green">❯</Text>
         </Box>
-      ))}
+        <TextInput
+          value={query}
+          onChange={handleQueryChange}
+          onSubmit={handleSubmit}
+          placeholder="input / "
+        />
+      </Box>
+
+      {suggestions.length > 0 && (
+        <Box flexDirection="column" marginTop={1} paddingLeft={1}>
+          {suggestions.map((s, i) => (
+            <Box key={s.cmd}>
+              <Text color={i === suggestionIndex ? 'cyan' : 'dimColor'}>
+                {i === suggestionIndex ? '▸ ' : '  '}
+                <Text bold color={i === suggestionIndex ? 'cyan' : 'white'}>
+                  /{s.cmd}
+                </Text>{' '}
+                <Text dimColor>- {s.desc}</Text>
+              </Text>
+            </Box>
+          ))}
+        </Box>
+      )}
+
       <Newline />
+
       <Box>
         <Text dimColor>
-          Use ↑/↓ to navigate, Enter to select, q/Esc to quit
+          Type <Text color="yellow" bold>/</Text> for commands, Esc to quit
         </Text>
       </Box>
     </Box>
