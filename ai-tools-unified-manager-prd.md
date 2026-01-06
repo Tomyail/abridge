@@ -764,6 +764,32 @@ abridge plugin uninstall @abridge/adapter-cursor
 - 插件模板和脚手架
 - 插件示例和最佳实践
 
+### 3.12 差异化同步策略 [P1]
+
+#### 功能描述
+
+随着接入工具的增加，用户需要针对不同工具配置不同的 MCP 服务器或参数。差异化同步允许用户精细控制配置的分发逻辑。
+
+#### 详细需求
+
+**1. 显式包含/排除 (Include/Exclude Control)**
+- 在 `mcp_servers` 的定义中增加 `only` 和 `ignore` 字段。
+- `only`: (字符串数组) 该服务器仅同步到指定的工具。
+- `ignore`: (字符串数组) 该服务器在指定工具中被忽略。
+
+**2. 环境参数覆盖 (Tool-specific Overrides)**
+- 增强 `tool_specific` 字段的覆盖逻辑。
+- 在应用（Apply）配置时，如果 `tool_specific[toolName]` 下存在核心配置字段（如 `args`, `env`, `url`），适配器应优先使用这些覆盖值，而非全局默认值。
+
+**3. 基于能力的选择性同步 (Capability-based Filtering)**
+- Abridge 自动通过适配器感知工具的能力。
+- 例如：如果一个 Server 的 `type` 是 `remote/http`，而某个适配器声明不支持 HTTP 传输，则同步时自动跳过该工具。
+
+#### 用户价值
+- **性能优化**：避免在所有工具中加载不必要的或重型的 MCP 服务器。
+- **环境隔离**：区分 CLI 和 GUI 工具的使用场景，提供更贴合工具特性的配置。
+- **灵活性**：支持复杂的跨工具工作流。
+
 ## 4. 技术方案
 
 ### 4.1 整体架构设计
