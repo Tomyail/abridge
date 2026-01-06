@@ -30,6 +30,7 @@ export class GeminiAdapter implements ToolAdapter {
         // Gemini uses 'url' for SSE
         mcpServers[server.name] = {
           url: server.url,
+          headers: server.headers && Object.keys(server.headers).length > 0 ? server.headers : undefined,
           ...toolSpecific,
         };
       }
