@@ -23,11 +23,11 @@
 
 #### One-Line Install (Recommended)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/lixuexin03/abridge/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Tomyail/abridge/main/install.sh | bash
 ```
 
 #### From GitHub Releases
-Download the pre-compiled binary for your platform from the [Releases](https://github.com/your-username/abridge/releases) page:
+Download the pre-compiled binary for your platform from the [Releases](https://github.com/Tomyail/abridge/releases) page:
 - `abridge-macos-arm64` (Apple Silicon)
 - `abridge-macos-x64` (Intel Mac)
 - `abridge-linux-x64`
@@ -46,7 +46,7 @@ npm install -g abridge
 
 #### From Source
 ```bash
-git clone https://github.com/your-username/abridge.git
+git clone https://github.com/Tomyail/abridge.git
 cd abridge
 bun install
 ```

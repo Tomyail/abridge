@@ -3,7 +3,7 @@
 set -e
 
 # Configuration
-REPO="lixuexin03/abridge"
+REPO="Tomyail/abridge"
 INSTALL_DIR="/usr/local/bin"
 BINARY_NAME="abridge"
 

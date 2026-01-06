@@ -22,11 +22,11 @@
 ### 安装
 #### 一键安装 (推荐)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/lixuexin03/abridge/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Tomyail/abridge/main/install.sh | bash
 ```
 
 #### 从 GitHub Releases 下载
-从 [Releases](https://github.com/your-username/abridge/releases) 页面下载对应平台的预编译二进制文件：
+从 [Releases](https://github.com/Tomyail/abridge/releases) 页面下载对应平台的预编译二进制文件：
 - `abridge-macos-arm64` (Apple Silicon Mac)
 - `abridge-macos-x64` (Intel Mac)
 - `abridge-linux-x64`
@@ -45,7 +45,7 @@ npm install -g abridge
 
 #### 从源码安装
 ```bash
-git clone https://github.com/your-username/abridge.git
+git clone https://github.com/Tomyail/abridge.git
 cd abridge
 bun install
 ```
