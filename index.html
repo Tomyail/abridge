@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Abridge 🌉 | Unified Config Manager for AI Agents</title>
+    <meta name="description" content="The bridge between Claude Code, Codex, and other AI agents. Centralized MCP server management with bidirectional sync." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="/assets/index-D9OO9yxZ.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DQL7C7GF.css">
+  </head>
+  <body>
+    <div id="app">
+      <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+      </div>
+
+      <nav>
+        <div class="logo">Abridge.</div>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#install">Installation</a>
+          <a href="https://github.com/Tomyail/abridge" target="_blank">GitHub</a>
+        </div>
+      </nav>
+
+      <section class="hero">
+        <h1>Bridge Your AI Workflow.</h1>
+        <p>Abridge is a unified configuration engine for modern AI terminal agents. Manage all your MCP servers, skills, and sessions in one place.</p>
+        
+        <div class="cta-group">
+          <a href="#install" class="btn btn-primary">Try One-Line Install</a>
+          <a href="https://github.com/Tomyail/abridge" target="_blank" class="btn btn-secondary">View Source</a>
+        </div>
+
+        <div id="install" class="install-box" onclick="copyInstallCommand()">
+          <code>curl -fsSL https://raw.githubusercontent.com/Tomyail/abridge/main/install.sh | bash</code>
+          <span class="copy-icon">📋</span>
+        </div>
+      </section>
+
+      <section id="features" class="features">
+        <div class="feature-card">
+          <h3>Dual-Path Sync.</h3>
+          <p>Instantly distribute MCP configs to all agents. Pull and merge existing settings from tools back to your unified core.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Any Protocol.</h3>
+          <p>Full support for Stdio, HTTP/Remote, and Local MCP servers. Build complex RAG or Tool-Calling architectures once.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Local-First.</h3>
+          <p>Zero data leaves your machine. Your API keys and secrets stay encrypted and strictly under your control.</p>
+        </div>
+      </section>
+    </div>
+    <script>
+      function copyInstallCommand() {
+        const text = "curl -fsSL https://raw.githubusercontent.com/Tomyail/abridge/main/install.sh | bash";
+        navigator.clipboard.writeText(text);
+        const box = document.querySelector('.install-box');
+        box.style.borderColor = "#00d4ff";
+        setTimeout(() => box.style.borderColor = "rgba(255, 255, 255, 0.1)", 1000);
+      }
+    </script>
+  </body>
+</html>
