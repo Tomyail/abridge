@@ -19,13 +19,20 @@ export class GeminiAdapter implements ToolAdapter {
       // Look for tool-specific overrides for 'gemini'
       const toolSpecific = server.tool_specific?.[this.name] || {};
       
-      // Basic mapping: name, command, args, env
-      mcpServers[server.name] = {
-        command: server.command,
-        args: server.args,
-        env: Object.keys(server.env).length > 0 ? server.env : undefined,
-        ...toolSpecific,
-      };
+      if (server.type === 'stdio' || !server.type) {
+        mcpServers[server.name] = {
+          command: server.command,
+          args: server.args,
+          env: Object.keys(server.env).length > 0 ? server.env : undefined,
+          ...toolSpecific,
+        };
+      } else if (server.type === 'http' || server.type === 'remote') {
+        // Gemini uses 'url' for SSE
+        mcpServers[server.name] = {
+          url: server.url,
+          ...toolSpecific,
+        };
+      }
     }
 
     return mcpServers;
