@@ -12,6 +12,7 @@
   - ✅ **Claude Code** (Supports the latest `.claude.json` monolithic format)
   - ✅ **Codex** (Supports `.codex/config.toml` format)
   - ✅ **OpenCode** (Supports `~/.config/opencode/opencode.json` format)
+  - ✅ **Antigravity** (Supports `~/.gemini/antigravity/mcp_config.json` format)
   - 🏗️ **Gemini CLI / Cursor** (Coming soon)
 - **High-Performance Runtime**: Built with [Bun](https://bun.sh/) for blazing-fast response times.
 - **Local-First**: All configurations and data are stored locally on your machine, ensuring maximum privacy.
