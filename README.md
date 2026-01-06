@@ -21,19 +21,29 @@
 
 ### Installation
 
-Currently in early development. You can use it by cloning the repository:
+#### From GitHub Releases (Recommended)
+Download the pre-compiled binary for your platform from the [Releases](https://github.com/your-username/abridge/releases) page:
+- `abridge-macos-arm64` (Apple Silicon)
+- `abridge-macos-x64` (Intel Mac)
+- `abridge-linux-x64`
+- `abridge-linux-arm64`
 
+After downloading, move it to your bin folder and make it executable:
 ```bash
-# Clone the repository
+chmod +x abridge-*
+sudo mv abridge-* /usr/local/bin/abridge
+```
+
+#### From NPM
+```bash
+npm install -g abridge
+```
+
+#### From Source
+```bash
 git clone https://github.com/your-username/abridge.git
 cd abridge
-
-# Install dependencies
 bun install
-
-# Link CLI globally
-cd packages/cli
-bun link
 ```
 
 ### Usage Guide
@@ -71,6 +81,7 @@ This project uses a Monorepo architecture:
 - [x] OpenCode Adapter (Bidirectional)
 - [x] Configuration merging logic
 - [x] Unified support for HTTP Headers and Remote MCP
+- [x] GitHub CI/CD automation for cross-platform distribution
 - [ ] Secret Masking (Encrypted storage for API keys/tokens)
 - [ ] Unified session history collection and search
 - [ ] Multi-device sync (via iCloud/Dropbox)

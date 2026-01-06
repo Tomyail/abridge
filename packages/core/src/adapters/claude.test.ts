@@ -18,10 +18,10 @@ describe("ClaudeCodeAdapter", () => {
     });
 
     const transformed = adapter.transform(config);
-    expect(transformed.mcpServers.test).toBeDefined();
-    expect(transformed.mcpServers.test.command).toBe("node");
-    expect(transformed.mcpServers.test.args).toEqual(["test.js"]);
-    expect(transformed.mcpServers.test.env).toEqual({ FOO: "BAR" });
+    expect(transformed.test).toBeDefined();
+    expect(transformed.test.command).toBe("node");
+    expect(transformed.test.args).toEqual(["test.js"]);
+    expect(transformed.test.env).toEqual({ FOO: "BAR" });
   });
 
   it("should handle tool-specific overrides", () => {
@@ -40,6 +40,6 @@ describe("ClaudeCodeAdapter", () => {
     });
 
     const transformed = adapter.transform(config);
-    expect(transformed.mcpServers.overridden.command).toBe("bun");
+    expect(transformed.overridden.command).toBe("bun");
   });
 });

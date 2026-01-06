@@ -20,20 +20,29 @@
 ## 🚀 快速上手
 
 ### 安装
+#### 从 GitHub Releases 下载 (推荐)
+从 [Releases](https://github.com/your-username/abridge/releases) 页面下载对应平台的预编译二进制文件：
+- `abridge-macos-arm64` (Apple Silicon Mac)
+- `abridge-macos-x64` (Intel Mac)
+- `abridge-linux-x64`
+- `abridge-linux-arm64`
 
-目前项目处于早期开发阶段，可以通过源码链接使用：
-
+下载后，移動到 bin 目录并赋予执行权限：
 ```bash
-# 克隆仓库
+chmod +x abridge-*
+sudo mv abridge-* /usr/local/bin/abridge
+```
+
+#### 通过 NPM 安装
+```bash
+npm install -g abridge
+```
+
+#### 从源码安装
+```bash
 git clone https://github.com/your-username/abridge.git
 cd abridge
-
-# 安装依赖
 bun install
-
-# 链接 CLI 到全局
-cd packages/cli
-bun link
 ```
 
 ### 使用指南
@@ -71,6 +80,7 @@ bun link
 - [x] OpenCode 适配器 (双向)
 - [x] 配置自动合并逻辑
 - [x] 统一 HTTP Headers 和 Remote MCP 支持
+- [x] 基于 GitHub Actions 的自动化跨平台分发流程
 - [ ] 敏感信息加密存储 (Secret Masking)
 - [ ] 会话记录统一采集与检索
 - [ ] 多设备同步 (基于 iCloud/Dropbox)
