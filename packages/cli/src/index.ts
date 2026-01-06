@@ -93,6 +93,17 @@ program
       
       await ConfigLoader.save(config);
       console.log(chalk.green('✓ Configuration imported and saved.'));
+
+      // Auto-sync push if enabled
+      if (config.sync?.enabled) {
+        try {
+          const manager = new SyncManager();
+          await manager.push();
+          console.log(chalk.gray('(Auto-synced to cloud drive)'));
+        } catch (e) {
+          console.warn(chalk.yellow('! Auto-sync failed, but local import succeeded.'));
+        }
+      }
     } catch (error) {
       console.error(chalk.red('Failed to import configuration:'), error);
     }
