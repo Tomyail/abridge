@@ -1,0 +1,13 @@
+{
+  "name": "abridge",
+  "version": "0.1.0",
+  "bin": {
+    "abridge": "src/index.ts"
+  },
+  "type": "module",
+  "dependencies": {
+    "@abridge/core": "workspace:*",
+    "commander": "^11.0.0",
+    "chalk": "^5.0.0"
+  }
+}

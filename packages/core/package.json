@@ -1,0 +1,10 @@
+{
+  "name": "@abridge/core",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "type": "module",
+  "dependencies": {
+    "hono": "^4.0.0",
+    "zod": "^3.0.0"
+  }
+}
