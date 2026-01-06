@@ -2,9 +2,12 @@ import { z } from 'zod';
 
 export const McpServerSchema = z.object({
   name: z.string(),
-  command: z.string(),
+  type: z.enum(['stdio', 'http', 'local', 'remote']).optional().default('stdio'),
+  command: z.string().optional().default(''),
   args: z.array(z.string()).optional().default([]),
   env: z.record(z.string()).optional().default({}),
+  url: z.string().optional(),
+  headers: z.record(z.string()).optional().default({}),
   tool_specific: z.record(z.record(z.any())).optional().default({}),
 });
 

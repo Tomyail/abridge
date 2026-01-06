@@ -7,11 +7,12 @@
 ## 🌟 Key Features
 
 - **Bidirectional Sync**: Effortlessly distribute configurations to multiple tools, and pull/merge existing configurations from tools back into Abridge.
-- **Unified MCP Management**: Support for both Stdio and HTTP MCP protocols. Configure once, use everywhere.
+- **Unified MCP Management**: Support for Stdio, HTTP, Local, and Remote MCP protocols. Configure once, use everywhere.
 - **Tool Adapters**:
   - ✅ **Claude Code** (Supports the latest `.claude.json` monolithic format)
   - ✅ **Codex** (Supports `.codex/config.toml` format)
-  - 🏗️ **OpenCode / Gemini CLI** (Coming soon)
+  - ✅ **OpenCode** (Supports `~/.config/opencode/opencode.json` format)
+  - 🏗️ **Gemini CLI / Cursor** (Coming soon)
 - **High-Performance Runtime**: Built with [Bun](https://bun.sh/) for blazing-fast response times.
 - **Local-First**: All configurations and data are stored locally on your machine, ensuring maximum privacy.
 
@@ -66,7 +67,9 @@ This project uses a Monorepo architecture:
 - [x] Unified config parsing (YAML)
 - [x] Claude Code Adapter (Bidirectional)
 - [x] Codex Adapter (Bidirectional)
+- [x] OpenCode Adapter (Bidirectional)
 - [x] Configuration merging logic
+- [x] Unified support for HTTP Headers and Remote MCP
 - [ ] Secret Masking (Encrypted storage for API keys/tokens)
 - [ ] Unified session history collection and search
 - [ ] Multi-device sync (via iCloud/Dropbox)

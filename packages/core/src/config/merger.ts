@@ -12,8 +12,11 @@ export function mergeConfigs(current: UnifiedConfig, incoming: Partial<UnifiedCo
         // Merge server info
         existingServers.set(incomingServer.name, {
           ...existing,
-          command: incomingServer.command,
-          args: incomingServer.args,
+          type: incomingServer.type || existing.type,
+          url: incomingServer.url || existing.url,
+          headers: { ...existing.headers, ...incomingServer.headers },
+          command: incomingServer.command || existing.command,
+          args: incomingServer.args || existing.args,
           env: { ...existing.env, ...incomingServer.env },
           tool_specific: {
             ...existing.tool_specific,

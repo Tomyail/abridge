@@ -7,11 +7,12 @@
 ## 🌟 核心特性
 
 - **双向同步 (Bidirectional Sync)**：不仅能将配置分发到各个工具，还能从已有的工具中反向拉取配置并合并。
-- **统一 MCP 管理**：支持 Stdio 和 HTTP 协议的 MCP 服务器，一次配置，全局生效。
+- **统一 MCP 管理**：支持 Stdio, HTTP, Local 和 Remote 协议的 MCP 服务器，一次配置，全局生效。
 - **工具支持**：
   - ✅ **Claude Code** (支持最新的 `.claude.json` 单体配置格式)
   - ✅ **Codex** (支持 `.codex/config.toml` 配置格式)
-  - 🏗️ **OpenCode / Gemini CLI** (开发中)
+  - ✅ **OpenCode** (支持 `~/.config/opencode/opencode.json` 配置格式)
+  - 🏗️ **Gemini CLI / Cursor** (开发中)
 - **高性能运行时**：基于 [Bun](https://bun.sh/) 开发，响应极快。
 - **本地优先**：所有配置和数据均保存在本地，保护隐私。
 
@@ -66,7 +67,9 @@ bun link
 - [x] 统一配置读取与解析 (YAML)
 - [x] Claude Code 适配器 (双向)
 - [x] Codex 适配器 (双向)
+- [x] OpenCode 适配器 (双向)
 - [x] 配置自动合并逻辑
+- [x] 统一 HTTP Headers 和 Remote MCP 支持
 - [ ] 敏感信息加密存储 (Secret Masking)
 - [ ] 会话记录统一采集与检索
 - [ ] 多设备同步 (基于 iCloud/Dropbox)

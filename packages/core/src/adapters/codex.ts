@@ -21,6 +21,9 @@ export class CodexAdapter implements ToolAdapter {
       const toolSpecific = server.tool_specific?.[this.name] || {};
       
       mcpServers[server.name] = {
+        type: server.type,
+        url: server.url,
+        headers: { ...(server.headers || {}), ...(toolSpecific.headers || {}) },
         command: server.command,
         args: server.args,
         env: Object.keys(server.env).length > 0 ? server.env : undefined,
@@ -66,12 +69,15 @@ export class CodexAdapter implements ToolAdapter {
       for (const [name, server] of Object.entries<any>(mcpServers)) {
         config.mcp_servers?.push({
           name,
+          type: server.type || (server.url ? 'http' : 'stdio'),
+          url: server.url,
+          headers: server.headers || {},
           command: server.command || '',
           args: server.args || [],
           env: server.env || {},
           tool_specific: {
             [this.name]: Object.fromEntries(
-              Object.entries(server).filter(([key]) => !['command', 'args', 'env'].includes(key))
+              Object.entries(server).filter(([key]) => !['command', 'args', 'env', 'type', 'url', 'headers'].includes(key))
             )
           }
         });

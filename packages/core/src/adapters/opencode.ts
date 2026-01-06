@@ -20,11 +20,11 @@ export class OpenCodeAdapter implements ToolAdapter {
       const toolSpecific = server.tool_specific?.[this.name] || {};
       
       // OpenCode prefers array command format
-      // If tool-specific has type 'remote', use that
-      if (toolSpecific.type === 'remote' || toolSpecific.url) {
+      if (server.type === 'remote' || server.type === 'http' || toolSpecific.type === 'remote' || server.url) {
         mcp[server.name] = {
           type: 'remote',
-          url: toolSpecific.url,
+          url: server.url || toolSpecific.url,
+          headers: { ...(server.headers || {}), ...(toolSpecific.headers || {}) },
           ...toolSpecific,
         };
       } else {
@@ -78,11 +78,16 @@ export class OpenCodeAdapter implements ToolAdapter {
         if (server.type === 'remote') {
           config.mcp_servers?.push({
             name,
+            type: 'remote',
+            url: server.url,
+            headers: server.headers || {},
             command: '',
             args: [],
             env: {},
             tool_specific: {
-              [this.name]: { ...server }
+              [this.name]: Object.fromEntries(
+                Object.entries(server).filter(([key]) => !['type', 'url', 'headers'].includes(key))
+              )
             }
           });
         } else {
@@ -90,12 +95,14 @@ export class OpenCodeAdapter implements ToolAdapter {
           const cmdArray = Array.isArray(server.command) ? server.command : [server.command];
           config.mcp_servers?.push({
             name,
+            type: 'stdio', // Map 'local' back to 'stdio' which is our internal default
             command: cmdArray[0] || '',
             args: cmdArray.slice(1),
             env: server.env || {},
+            headers: server.headers || {},
             tool_specific: {
               [this.name]: Object.fromEntries(
-                Object.entries(server).filter(([key]) => !['command', 'args', 'env'].includes(key))
+                Object.entries(server).filter(([key]) => !['command', 'args', 'env', 'type', 'headers'].includes(key))
               )
             }
           });

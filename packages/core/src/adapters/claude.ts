@@ -26,12 +26,12 @@ export class ClaudeCodeAdapter implements ToolAdapter {
     for (const server of config.mcp_servers) {
       const toolSpecific = server.tool_specific?.[this.name] || {};
       
-      // Handle different types of MCP servers (stdio is default)
-      if (toolSpecific.type === 'http' || (toolSpecific.url && !server.command)) {
+      // Handle different types of MCP servers
+      if (server.type === 'http' || toolSpecific.type === 'http' || server.url) {
         mcpServers[server.name] = {
           type: 'http',
-          url: toolSpecific.url,
-          headers: toolSpecific.headers || {},
+          url: server.url || toolSpecific.url,
+          headers: { ...(server.headers || {}), ...(toolSpecific.headers || {}) },
           ...toolSpecific,
         };
       } else {
@@ -98,22 +98,29 @@ export class ClaudeCodeAdapter implements ToolAdapter {
         if (server.type === 'http') {
           config.mcp_servers?.push({
             name,
+            type: 'http',
+            url: server.url,
+            headers: server.headers || {},
             command: '', 
             args: [],
             env: {},
             tool_specific: {
-              [this.name]: { ...server }
+              [this.name]: Object.fromEntries(
+                Object.entries(server).filter(([key]) => !['type', 'url', 'headers'].includes(key))
+              )
             }
           });
         } else {
           config.mcp_servers?.push({
             name,
+            type: 'stdio',
             command: server.command || '',
             args: server.args || [],
             env: server.env || {},
+            headers: {},
             tool_specific: {
               [this.name]: Object.fromEntries(
-                Object.entries(server).filter(([key]) => !['command', 'args', 'env'].includes(key))
+                Object.entries(server).filter(([key]) => !['command', 'args', 'env', 'type', 'headers'].includes(key))
               )
             }
           });
