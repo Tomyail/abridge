@@ -31,6 +31,15 @@ program
   .description('Apply configuration to all tools')
   .action(async () => {
     try {
+      const manager = new SyncManager();
+      
+      // Auto-pull if cloud is newer
+      const { status } = await manager.checkStatus();
+      if (status === 'outdated') {
+        console.log(chalk.blue('☁️ Cloud configuration is newer, auto-pulling...'));
+        await manager.pull();
+      }
+
       const config = await ConfigLoader.load();
       const adapters = registry.getAllAdapters();
       
