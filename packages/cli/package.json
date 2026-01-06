@@ -7,7 +7,14 @@
   "type": "module",
   "dependencies": {
     "@abridge/core": "workspace:*",
+    "chalk": "^5.0.0",
     "commander": "^11.0.0",
-    "chalk": "^5.0.0"
+    "ink": "^6.6.0",
+    "react": "^19.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "@types/react": "^19.2.7",
+    "react-devtools-core": "^7.0.1"
   }
 }

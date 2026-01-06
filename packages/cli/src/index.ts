@@ -2,13 +2,17 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { ConfigLoader, DEFAULT_CONFIG_PATH } from '@abridge/core';
+import { showWelcomeScreen } from './welcome.js';
 
 const program = new Command();
 
 program
   .name('abridge')
   .description('Unified AI Tools Manager')
-  .version('0.1.0');
+  .version('0.1.0')
+  .action(() => {
+    showWelcomeScreen();
+  });
 
 program
   .command('init')
