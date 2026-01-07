@@ -16,12 +16,14 @@ const COMMANDS = [
   { cmd: 'push', desc: 'Push to cloud' },
   { cmd: 'pull', desc: 'Pull from cloud' },
   { cmd: 'help', desc: 'Show help' },
+  { cmd: 'ui', desc: 'Open Workspace Dashboard' },
   { cmd: 'exit', desc: 'Exit' },
 ];
 
 export type AppAction = 
   | { type: 'exit' }
   | { type: 'launch'; toolId: string }
+  | { type: 'ui' } // New action
   | { type: 'run'; cmd: string };
 
 interface LaunchableTool {

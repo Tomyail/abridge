@@ -1,18 +1,21 @@
 {
   "name": "abridge",
+  "module": "index.ts",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5"
+  },
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "dev": "bun run --cwd packages/cli src/index.ts",
     "web:dev": "bun --cwd packages/web run dev",
     "web:build": "bun --cwd packages/web run build"
   },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "^5"
-  },
-  "module": "index.ts",
-  "type": "module"
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "@skitee3000/bun-pty": "^0.3.3"
+  }
 }

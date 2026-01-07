@@ -12,11 +12,13 @@
   - ✅ **Claude Code** (Supports the latest `.claude.json` monolithic format)
   - ✅ **Codex** (Supports `.codex/config.toml` format)
   - ✅ **OpenCode** (Supports `~/.config/opencode/opencode.json` format)
+  - ✅ **Crush** (Supports `~/.config/crush/config.json` format)
   - ✅ **Antigravity** (Supports `~/.gemini/antigravity/mcp_config.json` format)
   - ✅ **Gemini CLI** (Supports `~/.gemini/settings.json` format)
   - 🏗️ **Cursor** (Coming soon)
 - **High-Performance Runtime**: Built with [Bun](https://bun.sh/) for blazing-fast response times.
-- **Interactive Launch**: Quickly start your favorite AI coding tools directly from Abridge with the `/launch` command. Supports TUI selection and argument autocomplete.
+- **TUI Workspace Manager**: A centralized dashboard to manage multiple running agents using `abridge ui`. Monitor logs, switch focus, and keep agents running in the background. (Experimental)
+- **Launch Command**: Rapidly start AI coding tools via `abridge launch` or the TUI dashboard. Includes interactive selection and tool detection.
 - **Local-First**: All configurations and data are stored locally on your machine, ensuring maximum privacy.
 
 ## 🚀 Quick Start
@@ -60,7 +62,7 @@ bun install
    abridge init
    ```
 
-2. **Import Configuration**: Pull your existing MCP servers from installed tools like Claude Code or Codex.
+2. **Import Configuration**: Pull your existing MCP servers from installed tools.
    ```bash
    abridge import
    ```
@@ -72,18 +74,20 @@ bun install
    abridge apply
    ```
 
-5. **Launch Tools**: Use the interactive TUI to launch supported tools (Claude Code, OpenCode).
+5. **Workspace UI**: Start the TUI dashboard to launch and manage agents.
    ```bash
-   abridge # Opens the interactive welcome screen
-   # Type /launch to select a tool, or /launch claude directly
+   abridge ui # Starts the dashboard
+   # Press 't' to launch a new agent (Claude, Crush, etc.)
+   # Use keys [1-9] to switch between active sessions.
+   # Press Ctrl+q or Ctrl+a to detach and return to the menu.
    ```
 
 ## 📂 Project Structure
 
 This project uses a Monorepo architecture:
 
-- `packages/cli`: Command-line interface implementation.
-- `packages/core`: Core logic, adapter system, configuration parsing, and merging.
+- `packages/cli`: Command-line interface and TUI implementation.
+- `packages/core`: Core logic, adapter system, process management.
 - `packages/sdk`: SDK for integration with other tools.
 
 ## 🗺️ Roadmap
@@ -92,10 +96,12 @@ This project uses a Monorepo architecture:
 - [x] Claude Code Adapter (Bidirectional)
 - [x] Codex Adapter (Bidirectional)
 - [x] OpenCode Adapter (Bidirectional)
+- [x] Crush Adapter (Launch Support)
 - [x] Configuration merging logic
 - [x] Unified support for HTTP Headers and Remote MCP
 - [x] GitHub CI/CD automation for cross-platform distribution
-- [x] Interactive `/launch` command with TUI
+- [x] Interactive `/launch` command
+- [x] **Phase 2: TUI Workspace Manager** (Process Supervisor, Dashboard)
 - [ ] Secret Masking (Encrypted storage for API keys/tokens)
 - [ ] Unified session history collection and search
 - [ ] Multi-device sync (via iCloud/Dropbox)

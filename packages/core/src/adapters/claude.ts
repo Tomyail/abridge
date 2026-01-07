@@ -162,4 +162,55 @@ export class ClaudeCodeAdapter implements ToolAdapter {
       throw e;
     }
   }
+
+  async getLaunchConfig(): Promise<{ command: string; args: string[]; cwd?: string }> {
+      const { execSync } = await import('child_process');
+      const { existsSync, realpathSync } = await import('node:fs');
+      const { join } = await import('path');
+      const os = await import('os');
+
+      // Helper to try resolving path
+      const resolveSafe = (p: string) => {
+          if (!existsSync(p)) return null;
+          try { return realpathSync(p); } catch { return p; }
+      };
+
+      // 1. Check NPM Global
+      try {
+          const globalRoot = execSync('npm root -g', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+          const npmCli = join(globalRoot, '@anthropic-ai', 'claude-code', 'cli.js');
+          if (existsSync(npmCli)) {
+              return { command: 'node', args: [npmCli] };
+          }
+      } catch (e) { /* ignore */ }
+
+      // 2. Check Homebrew (macOS)
+      if (process.platform === 'darwin') {
+          const prefixes = ['/opt/homebrew', '/usr/local'];
+          for (const prefix of prefixes) {
+              const bin = join(prefix, 'bin', 'claude');
+              const resolved = resolveSafe(bin);
+              if (resolved) return { command: resolved, args: [] };
+          }
+      }
+
+      // 3. Check Native Installer (~/.local/bin/claude)
+      const localBin = join(os.homedir(), '.local', 'bin', 'claude');
+      const resolvedLocal = resolveSafe(localBin);
+      if (resolvedLocal) return { command: resolvedLocal, args: [] };
+
+      // 4. Check PATH
+      try {
+          const pathBin = execSync('which claude', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+          if (pathBin && existsSync(pathBin)) {
+               return { command: pathBin, args: [] };
+          }
+      } catch (e) { /* ignore */ }
+
+      // 5. Fallback
+      return {
+          command: 'npx',
+          args: ['claude', 'code'], 
+      };
+  }
 }

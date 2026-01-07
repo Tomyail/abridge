@@ -1,7 +1,9 @@
 #!/usr/bin/env bun
+import './polyfill';
 import { Command } from 'commander';
+
 import { showWelcomeScreen } from './welcome.js';
-import { runInit, runApply, runImport, runStatus, runSyncPush, runSyncPull } from './actions.js';
+import { runInit, runApply, runImport, runStatus, runSyncPush, runSyncPull, runUi } from './actions.js';
 
 const program = new Command();
 
@@ -15,6 +17,11 @@ program
       
       if (action.type === 'exit') {
         process.exit(0);
+      }
+      
+      if (action.type === 'ui') {
+        const { runUi } = await import('./actions.js');
+        await runUi();
       }
       
       if (action.type === 'launch') {
@@ -62,5 +69,10 @@ sync
   .command('status')
   .description('Check synchronization status')
   .action(runStatus);
+
+program
+  .command('ui')
+  .description('Open Workspace Dashboard')
+  .action(runUi);
 
 program.parse();

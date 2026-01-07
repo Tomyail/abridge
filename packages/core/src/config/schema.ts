@@ -29,8 +29,17 @@ export const SyncSchema = z.object({
   path: z.string().optional().describe('Custom sync path (leave empty to auto-detect iCloud/Dropbox)'),
 });
 
+export const AgentSchema = z.object({
+  name: z.string().describe('Display name of the agent'),
+  command: z.string().describe('Command to execute'),
+  args: z.array(z.string()).optional().default([]).describe('Arguments for the command'),
+  cwd: z.string().optional().describe('Working directory'),
+  autoStart: z.boolean().optional().default(false).describe('Start on launch'),
+});
+
 export const UnifiedConfigSchema = z.object({
   mcp_servers: z.array(McpServerSchema).optional().default([]).describe('MCP server configuration list'),
+  agents: z.array(AgentSchema).optional().default([]).describe('Agent/Task configuration list'),
   skills: z.array(SkillSchema).optional().default([]).describe('Skills configuration list'),
   sync: SyncSchema.optional().default({ enabled: false }).describe('Cloud sync configuration'),
 });

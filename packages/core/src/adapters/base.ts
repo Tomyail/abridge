@@ -29,4 +29,9 @@ export interface ToolAdapter {
    * If implemented, this tool will appear in the /launch menu.
    */
   launch?(): Promise<void>;
+
+  /**
+   * Returns configuration for launching via PTY manager.
+   */
+  getLaunchConfig?(): Promise<{ command: string; args: string[]; cwd?: string }>;
 }

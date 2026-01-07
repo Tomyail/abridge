@@ -1,5 +1,15 @@
 import chalk from 'chalk';
 import { ConfigLoader, DEFAULT_CONFIG_PATH, registry, mergeConfigs, SyncManager } from '@abridge/core';
+import React from 'react';
+import { render } from 'ink';
+import { App } from './ui/app.js';
+
+export async function runUi() {
+    console.clear();
+    const config = await ConfigLoader.load();
+    const { waitUntilExit } = render(React.createElement(App, { config }));
+    await waitUntilExit();
+}
 
 export async function runInit() {
   console.log(chalk.blue(`Initializing configuration at ${DEFAULT_CONFIG_PATH}...`));

@@ -98,4 +98,11 @@ export class CrushAdapter implements ToolAdapter {
       throw e;
     }
   }
+
+  async getLaunchConfig(): Promise<{ command: string; args: string[]; cwd?: string }> {
+      return {
+          command: 'crush',
+          args: [],
+      };
+  }
 }
