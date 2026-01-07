@@ -4,6 +4,7 @@ import { CodexAdapter } from './codex';
 import { OpenCodeAdapter } from './opencode';
 import { AntigravityAdapter } from './antigravity';
 import { GeminiAdapter } from './gemini';
+import { CrushAdapter } from './crush';
 
 export * from './base';
 export * from './claude';
@@ -11,6 +12,7 @@ export * from './codex';
 export * from './opencode';
 export * from './antigravity';
 export * from './gemini';
+export * from './crush';
 
 export class AdapterRegistry {
   private adapters: Map<string, ToolAdapter> = new Map();
@@ -21,6 +23,7 @@ export class AdapterRegistry {
     this.register(new OpenCodeAdapter());
     this.register(new AntigravityAdapter());
     this.register(new GeminiAdapter());
+    this.register(new CrushAdapter());
   }
 
   register(adapter: ToolAdapter) {
