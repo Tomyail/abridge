@@ -25,7 +25,7 @@ export type AppAction =
 
 const TOOLS = [
   { name: 'Claude Code', id: 'claude-code' },
-   // Add more later: { name: 'Gemini', id: 'gemini' }
+  { name: 'OpenCode', id: 'opencode' },
 ];
 
 const WelcomeScreen = ({ onAction }: { onAction: (action: AppAction) => void }) => {

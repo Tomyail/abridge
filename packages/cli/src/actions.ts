@@ -135,17 +135,18 @@ export async function runLaunch(tool: string = 'claude-code') {
   console.clear(); 
   console.log(chalk.blue(`Launching ${tool}...`));
   
-  if (tool === 'claude-code') {
+  if (tool === 'claude-code' || tool === 'opencode') {
     const { spawn } = await import('child_process');
+    const cmd = tool === 'opencode' ? 'opencode' : 'claude';
     
-    // Explicitly clean up TTY state before handing off
+    // Explicitly clean up TTY state before heading off (crucial for Ink -> Child CLI handoff)
     if (process.stdin.isTTY) {
       process.stdin.setRawMode(false);
     }
     process.stdin.pause();
 
     try {
-      const child = spawn('claude', [], { 
+      const child = spawn(cmd, [], { 
         stdio: 'inherit',
         env: process.env 
       });
@@ -157,7 +158,7 @@ export async function runLaunch(tool: string = 'claude-code') {
         });
         child.on('error', reject);
       });
-      console.clear(); // Clear after exit
+      console.clear(); 
     } catch (e) {
       console.error(chalk.red(`Failed to launch ${tool}`), e);
     }
