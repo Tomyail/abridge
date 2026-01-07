@@ -35,9 +35,28 @@ const WelcomeScreen = ({ onAction }: { onAction: (action: AppAction) => void }) 
   const [selectedToolIndex, setSelectedToolIndex] = useState(0);
   const [inputKey, setInputKey] = useState(0); // Used to reset TextInput cursor
 
-  const suggestions = (!isLaunchMode && query.startsWith('/'))
-    ? COMMANDS.filter((c) => c.cmd.startsWith(query.slice(1)))
-    : [];
+  let suggestions: { cmd: string, desc: string }[] = [];
+  if (!isLaunchMode && query.startsWith('/')) {
+    const inputCmd = query.slice(1).toLowerCase();
+    
+    // 1. Standard commands
+    suggestions = COMMANDS.filter((c) => c.cmd.startsWith(inputCmd));
+
+    // 2. Launch arguments
+    if (inputCmd.startsWith('launch ')) {
+      const arg = inputCmd.slice(7).trim(); // remove "launch "
+      const toolMatches = TOOLS.filter(t => 
+         t.id.includes(arg) || t.name.toLowerCase().includes(arg)
+      );
+      
+      const toolSuggestions = toolMatches.map(t => ({
+         cmd: `launch ${t.id}`, 
+         desc: `Launch ${t.name}`
+      }));
+      
+      suggestions = [...suggestions, ...toolSuggestions];
+    }
+  }
 
   useInput((_input: string, key) => {
     if (key.escape) {
@@ -70,7 +89,7 @@ const WelcomeScreen = ({ onAction }: { onAction: (action: AppAction) => void }) 
       if (currentSuggestion) {
         setQuery('/' + currentSuggestion.cmd);
         setSuggestionIndex((suggestionIndex + 1) % suggestions.length);
-        setInputKey(prev => prev + 1); // Force remount to move cursor to end
+        setInputKey((prev: number) => prev + 1); // Force remount to move cursor to end
       }
     }
 
