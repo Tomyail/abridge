@@ -9,8 +9,26 @@ program
   .name('abridge')
   .description('Unified AI Tools Manager')
   .version('0.1.0')
-  .action(() => {
-    showWelcomeScreen();
+  .action(async () => {
+    while (true) {
+      const action = await showWelcomeScreen();
+      
+      if (action.type === 'exit') {
+        process.exit(0);
+      }
+      
+      if (action.type === 'launch') {
+        const { runLaunch } = await import('./actions.js');
+        await runLaunch(action.toolId);
+        // Loop continues, showing welcome screen again
+      }
+      
+      if (action.type === 'run') {
+         // Handle other commands if migrated to return actions
+         // Currently welcome.tsx handles them directly for init/import etc.
+         // But we can migrate them here later for consistency.
+      }
+    }
   });
 
 program

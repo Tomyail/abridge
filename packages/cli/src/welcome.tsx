@@ -1,10 +1,13 @@
-#!/usr/bin/env bun
+/**
+ * Welcome screen implementation using Ink (React-based TUI)
+ */
 import React, { useState } from 'react';
 import { render, Box, Text, Newline, useInput } from 'ink';
 import TextInput from 'ink-text-input';
-import { runInit, runApply, runImport, runStatus, runSyncPush, runSyncPull } from './actions.js';
+import { runInit, runApply, runImport, runStatus, runSyncPush, runSyncPull, runLaunch } from './actions.js';
 
 const COMMANDS = [
+  { cmd: 'launch', desc: 'Launch tools (e.g. Claude Code)' },
   { cmd: 'init', desc: 'Initialize configuration' },
   { cmd: 'import', desc: 'Import from tools' },
   { cmd: 'apply', desc: 'Apply configuration' },
@@ -15,17 +18,51 @@ const COMMANDS = [
   { cmd: 'exit', desc: 'Exit' },
 ];
 
-const WelcomeScreen = () => {
+export type AppAction = 
+  | { type: 'exit' }
+  | { type: 'launch'; toolId: string }
+  | { type: 'run'; cmd: string };
+
+const TOOLS = [
+  { name: 'Claude Code', id: 'claude-code' },
+   // Add more later: { name: 'Gemini', id: 'gemini' }
+];
+
+const WelcomeScreen = ({ onAction }: { onAction: (action: AppAction) => void }) => {
   const [query, setQuery] = useState('');
   const [suggestionIndex, setSuggestionIndex] = useState(0);
+  const [isLaunchMode, setIsLaunchMode] = useState(false);
+  const [selectedToolIndex, setSelectedToolIndex] = useState(0);
+  const [inputKey, setInputKey] = useState(0); // Used to reset TextInput cursor
 
-  const suggestions = query.startsWith('/')
+  const suggestions = (!isLaunchMode && query.startsWith('/'))
     ? COMMANDS.filter((c) => c.cmd.startsWith(query.slice(1)))
     : [];
 
-  useInput((input, key) => {
+  useInput((_input: string, key) => {
     if (key.escape) {
-      process.exit(0);
+      if (isLaunchMode) {
+        setIsLaunchMode(false);
+        setQuery('');
+      } else {
+        onAction({ type: 'exit' });
+      }
+    }
+
+    if (isLaunchMode) {
+       if (key.upArrow) {
+         setSelectedToolIndex((prev: number) => (prev > 0 ? prev - 1 : TOOLS.length - 1));
+       }
+       if (key.downArrow) {
+         setSelectedToolIndex((prev: number) => (prev < TOOLS.length - 1 ? prev + 1 : 0));
+       }
+       if (key.return) {
+          const toolId = TOOLS[selectedToolIndex].id;
+          setIsLaunchMode(false);
+          setQuery(''); // Reset for next render
+          onAction({ type: 'launch', toolId });
+       }
+       return;
     }
 
     if (key.tab && suggestions.length > 0) {
@@ -33,15 +70,16 @@ const WelcomeScreen = () => {
       if (currentSuggestion) {
         setQuery('/' + currentSuggestion.cmd);
         setSuggestionIndex((suggestionIndex + 1) % suggestions.length);
+        setInputKey(prev => prev + 1); // Force remount to move cursor to end
       }
     }
 
     if (key.upArrow && suggestions.length > 0) {
-      setSuggestionIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
+      setSuggestionIndex((prev: number) => (prev > 0 ? prev - 1 : suggestions.length - 1));
     }
 
     if (key.downArrow && suggestions.length > 0) {
-      setSuggestionIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
+      setSuggestionIndex((prev: number) => (prev < suggestions.length - 1 ? prev + 1 : 0));
     }
   });
 
@@ -50,23 +88,26 @@ const WelcomeScreen = () => {
     setSuggestionIndex(0);
   };
 
-  const handleSubmit = async (value: string) => {
-    const command = value.trim().toLowerCase();
-    
-    if (command === '/exit' || command === '/quit') {
-      process.exit(0);
-    }
-
-    if (command.startsWith('/')) {
-      await handleCommand(command.slice(1));
-    } else if (command.length > 0) {
-      setQuery('');
-    }
-  };
-
-
-  const handleCommand = async (cmd: string) => {
+  const handleCommand = async (cmd: string, args: string[] = []) => {
     switch (cmd) {
+      case 'launch':
+        if (args.length > 0) {
+          const toolName = args.join(' ').toLowerCase(); 
+          const tool = TOOLS.find(t => t.id === toolName || t.name.toLowerCase().includes(toolName));
+          if (tool) {
+            onAction({ type: 'launch', toolId: tool.id });
+          } else {
+             console.log(`\nTool '${toolName}' not found. Entering launch mode...\n`);
+             setIsLaunchMode(true);
+             setQuery('');
+             return; // Don't clear query
+          }
+        } else {
+          setIsLaunchMode(true);
+          setQuery(''); 
+          return; // Don't clear query
+        }
+        break;
       case 'init':
         await runInit();
         break;
@@ -86,8 +127,12 @@ const WelcomeScreen = () => {
         await runSyncPull();
         break;
       case 'help':
-        console.log('\nAvailable commands: /init, /import, /apply, /status, /push, /pull, /help, /exit\n');
+        console.log('\nAvailable commands: /launch, /init, /import, /apply, /status, /push, /pull, /help, /exit\n');
         break;
+      case 'exit':
+      case 'quit':
+        onAction({ type: 'exit' });
+        return;
       default:
         console.log(`\nUnknown command: /${cmd}. Type /help for available commands.\n`);
         break;
@@ -95,7 +140,27 @@ const WelcomeScreen = () => {
     setQuery('');
   };
 
+  const handleSubmit = async (value: string) => {
+    const command = value.trim().toLowerCase();
+    
+    if (command === '/exit' || command === '/quit') {
+      onAction({ type: 'exit' });
+      return;
+    }
+    
+    if (isLaunchMode) return;
 
+    if (command.startsWith('/')) {
+      const parts = command.slice(1).split(' ');
+      const cmdName = parts[0];
+      const args = parts.slice(1);
+      if (cmdName) {
+         await handleCommand(cmdName, args);
+      }
+    } else if (command.length > 0) {
+      setQuery('');
+    }
+  };
 
   return (
     <Box flexDirection="column" paddingX={2}>
@@ -127,17 +192,37 @@ const WelcomeScreen = () => {
       </Box>
       <Newline />
       
-      <Box borderStyle="round" paddingX={1} borderColor="green">
+      <Box borderStyle="round" paddingX={1} borderColor={isLaunchMode ? "magenta" : "green"}>
         <Box marginRight={1}>
-          <Text bold color="green">❯</Text>
+          <Text bold color={isLaunchMode ? "magenta" : "green"}>{isLaunchMode ? "🚀" : "❯"}</Text>
         </Box>
-        <TextInput
-          value={query}
-          onChange={handleQueryChange}
-          onSubmit={handleSubmit}
-          placeholder="input / "
-        />
+        {isLaunchMode ? (
+           <Text>Select tool to launch (Up/Down/Enter)</Text>
+        ) : (
+          <TextInput
+            key={inputKey.toString()}
+            value={query}
+            onChange={handleQueryChange}
+            onSubmit={handleSubmit}
+            placeholder="input / "
+          />
+        )}
       </Box>
+
+      {isLaunchMode && (
+        <Box flexDirection="column" marginTop={1} paddingLeft={1}>
+          {TOOLS.map((t, i) => (
+             <Box key={t.id}>
+               <Text color={i === selectedToolIndex ? 'magenta' : 'dimColor'}>
+                 {i === selectedToolIndex ? '▸ ' : '  '}
+                 <Text bold color={i === selectedToolIndex ? 'magenta' : 'white'}>
+                   {t.name}
+                 </Text>
+               </Text>
+             </Box>
+          ))}
+        </Box>
+      )}
 
       {suggestions.length > 0 && (
         <Box flexDirection="column" marginTop={1} paddingLeft={1}>
@@ -166,6 +251,13 @@ const WelcomeScreen = () => {
   );
 };
 
-export const showWelcomeScreen = () => {
-  render(<WelcomeScreen />);
+export const showWelcomeScreen = async (): Promise<AppAction> => {
+  return new Promise((resolve) => {
+    const { unmount } = render(<WelcomeScreen onAction={(action) => {
+      setTimeout(() => {
+        unmount();
+        resolve(action);
+      }, 50);
+    }} />);
+  });
 };

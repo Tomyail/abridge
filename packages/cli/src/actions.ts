@@ -131,3 +131,37 @@ export async function runSyncPull() {
   }
 }
 
+export async function runLaunch(tool: string = 'claude-code') {
+  console.clear(); 
+  console.log(chalk.blue(`Launching ${tool}...`));
+  
+  if (tool === 'claude-code') {
+    const { spawn } = await import('child_process');
+    
+    // Explicitly clean up TTY state before handing off
+    if (process.stdin.isTTY) {
+      process.stdin.setRawMode(false);
+    }
+    process.stdin.pause();
+
+    try {
+      const child = spawn('claude', [], { 
+        stdio: 'inherit',
+        env: process.env 
+      });
+      
+      await new Promise<void>((resolve, reject) => {
+        child.on('exit', (code) => {
+          if (code === 0) resolve();
+          else reject(new Error(`Process exited with code ${code}`));
+        });
+        child.on('error', reject);
+      });
+      console.clear(); // Clear after exit
+    } catch (e) {
+      console.error(chalk.red(`Failed to launch ${tool}`), e);
+    }
+  } else {
+    console.warn(chalk.yellow(`Tool ${tool} launch not yet implemented.`));
+  }
+}
