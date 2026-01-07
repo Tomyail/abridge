@@ -46,15 +46,30 @@ export class CodexAdapter implements ToolAdapter {
     const file = Bun.file(this.configPath);
     let fullConfig: any = {};
     
+    let existingMcpServers: any = {};
+
     if (await file.exists()) {
       try {
-        fullConfig = parse(await file.text());
+        const text = await file.text();
+        fullConfig = parse(text);
+        existingMcpServers = fullConfig.mcp_servers || {};
       } catch (e) {
         console.warn(`Failed to parse existing config at ${this.configPath}, starting fresh.`);
       }
     }
 
-    fullConfig.mcp_servers = this.transform(config);
+    const newMcpServers = this.transform(config);
+
+    // Merge strategy: Preserve existing environment variables if not specified in new config
+    // This allows tool-managed auth tokens (like GITHUB_TOKEN) to survive 'abridge apply'
+    for (const [name, newServer] of Object.entries<any>(newMcpServers)) {
+      const oldServer = existingMcpServers[name];
+      if (oldServer && oldServer.env) {
+        newServer.env = { ...oldServer.env, ...(newServer.env || {}) };
+      }
+    }
+
+    fullConfig.mcp_servers = newMcpServers;
 
     await Bun.write(this.configPath, stringify(fullConfig));
   }
