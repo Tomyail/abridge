@@ -135,34 +135,17 @@ export async function runLaunch(tool: string = 'claude-code') {
   console.clear(); 
   console.log(chalk.blue(`Launching ${tool}...`));
   
-  if (tool === 'claude-code' || tool === 'opencode') {
-    const { spawn } = await import('child_process');
-    const cmd = tool === 'opencode' ? 'opencode' : 'claude';
-    
-    // Explicitly clean up TTY state before heading off (crucial for Ink -> Child CLI handoff)
-    if (process.stdin.isTTY) {
-      process.stdin.setRawMode(false);
-    }
-    process.stdin.pause();
+  const adapters = registry.getAllAdapters();
+  const adapter = adapters.find(a => a.name === tool);
 
+  if (adapter && adapter.launch) {
     try {
-      const child = spawn(cmd, [], { 
-        stdio: 'inherit',
-        env: process.env 
-      });
-      
-      await new Promise<void>((resolve, reject) => {
-        child.on('exit', (code) => {
-          if (code === 0) resolve();
-          else reject(new Error(`Process exited with code ${code}`));
-        });
-        child.on('error', reject);
-      });
-      console.clear(); 
+        await adapter.launch();
+        console.clear(); 
     } catch (e) {
-      console.error(chalk.red(`Failed to launch ${tool}`), e);
+        console.error(chalk.red(`Failed to launch ${tool}`), e);
     }
   } else {
-    console.warn(chalk.yellow(`Tool ${tool} launch not yet implemented.`));
+    console.warn(chalk.yellow(`Tool ${tool} does not support launching or is not installed.`));
   }
 }

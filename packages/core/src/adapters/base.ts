@@ -23,4 +23,10 @@ export interface ToolAdapter {
    * Extracts current configuration from the tool and converts it to partial unified config.
    */
   extract(): Promise<Partial<UnifiedConfig>>;
+
+  /**
+   * Launches the tool interactively.
+   * If implemented, this tool will appear in the /launch menu.
+   */
+  launch?(): Promise<void>;
 }

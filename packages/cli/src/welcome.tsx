@@ -4,7 +4,8 @@
 import React, { useState } from 'react';
 import { render, Box, Text, Newline, useInput } from 'ink';
 import TextInput from 'ink-text-input';
-import { runInit, runApply, runImport, runStatus, runSyncPush, runSyncPull, runLaunch } from './actions.js';
+import { registry } from '@abridge/core';
+import { runInit, runApply, runImport, runStatus, runSyncPush, runSyncPull } from './actions.js';
 
 const COMMANDS = [
   { cmd: 'launch', desc: 'Launch tools (e.g. Claude Code)' },
@@ -23,12 +24,22 @@ export type AppAction =
   | { type: 'launch'; toolId: string }
   | { type: 'run'; cmd: string };
 
-const TOOLS = [
-  { name: 'Claude Code', id: 'claude-code' },
-  { name: 'OpenCode', id: 'opencode' },
-];
+interface LaunchableTool {
+  name: string;
+  id: string;
+}
+
+const getLaunchableTools = (): LaunchableTool[] => {
+  return registry.getAllAdapters()
+    .filter(adapter => typeof adapter.launch === 'function')
+    .map(adapter => ({
+      name: adapter.name,
+      id: adapter.name 
+    }));
+};
 
 const WelcomeScreen = ({ onAction }: { onAction: (action: AppAction) => void }) => {
+  const [tools] = useState(getLaunchableTools());
   const [query, setQuery] = useState('');
   const [suggestionIndex, setSuggestionIndex] = useState(0);
   const [isLaunchMode, setIsLaunchMode] = useState(false);
@@ -45,7 +56,7 @@ const WelcomeScreen = ({ onAction }: { onAction: (action: AppAction) => void }) 
     // 2. Launch arguments
     if (inputCmd.startsWith('launch ')) {
       const arg = inputCmd.slice(7).trim(); // remove "launch "
-      const toolMatches = TOOLS.filter(t => 
+      const toolMatches = tools.filter(t => 
          t.id.includes(arg) || t.name.toLowerCase().includes(arg)
       );
       
@@ -70,13 +81,13 @@ const WelcomeScreen = ({ onAction }: { onAction: (action: AppAction) => void }) 
 
     if (isLaunchMode) {
        if (key.upArrow) {
-         setSelectedToolIndex((prev: number) => (prev > 0 ? prev - 1 : TOOLS.length - 1));
+         setSelectedToolIndex((prev: number) => (prev > 0 ? prev - 1 : tools.length - 1));
        }
        if (key.downArrow) {
-         setSelectedToolIndex((prev: number) => (prev < TOOLS.length - 1 ? prev + 1 : 0));
+         setSelectedToolIndex((prev: number) => (prev < tools.length - 1 ? prev + 1 : 0));
        }
        if (key.return) {
-          const toolId = TOOLS[selectedToolIndex].id;
+          const toolId = tools[selectedToolIndex].id;
           setIsLaunchMode(false);
           setQuery(''); // Reset for next render
           onAction({ type: 'launch', toolId });
@@ -112,7 +123,7 @@ const WelcomeScreen = ({ onAction }: { onAction: (action: AppAction) => void }) 
       case 'launch':
         if (args.length > 0) {
           const toolName = args.join(' ').toLowerCase(); 
-          const tool = TOOLS.find(t => t.id === toolName || t.name.toLowerCase().includes(toolName));
+          const tool = tools.find(t => t.id === toolName || t.name.toLowerCase().includes(toolName));
           if (tool) {
             onAction({ type: 'launch', toolId: tool.id });
           } else {
@@ -230,7 +241,7 @@ const WelcomeScreen = ({ onAction }: { onAction: (action: AppAction) => void }) 
 
       {isLaunchMode && (
         <Box flexDirection="column" marginTop={1} paddingLeft={1}>
-          {TOOLS.map((t, i) => (
+          {tools.map((t, i) => (
              <Box key={t.id}>
                <Text color={i === selectedToolIndex ? 'magenta' : 'dimColor'}>
                  {i === selectedToolIndex ? '▸ ' : '  '}
