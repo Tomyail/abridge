@@ -1,5 +1,4 @@
 import { Terminal } from '@xterm/headless';
-import { SerializeAddon } from '@xterm/addon-serialize';
 import type { IPty } from '@skitee3000/bun-pty';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -20,7 +19,6 @@ export class Session {
   
   // Headless terminal to maintain state
   private term: Terminal;
-  private serializeAddon: SerializeAddon;
 
   constructor(pty: IPty, readonly command: string, readonly args: string[]) {
     this.id = uuidv4();
@@ -41,9 +39,6 @@ export class Session {
       scrollback: 1000
     });
     
-    this.serializeAddon = new SerializeAddon();
-    this.term.loadAddon(this.serializeAddon);
-
     // Hook into data flow
     this.pty.onData((data) => {
       this.term.write(data);
