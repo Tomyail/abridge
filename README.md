@@ -16,6 +16,7 @@
   - ✅ **Gemini CLI** (Supports `~/.gemini/settings.json` format)
   - 🏗️ **Cursor** (Coming soon)
 - **High-Performance Runtime**: Built with [Bun](https://bun.sh/) for blazing-fast response times.
+- **Interactive Launch**: Quickly start your favorite AI coding tools directly from Abridge with the `/launch` command. Supports TUI selection and argument autocomplete.
 - **Local-First**: All configurations and data are stored locally on your machine, ensuring maximum privacy.
 
 ## 🚀 Quick Start
@@ -71,6 +72,12 @@ bun install
    abridge apply
    ```
 
+5. **Launch Tools**: Use the interactive TUI to launch supported tools (Claude Code, OpenCode).
+   ```bash
+   abridge # Opens the interactive welcome screen
+   # Type /launch to select a tool, or /launch claude directly
+   ```
+
 ## 📂 Project Structure
 
 This project uses a Monorepo architecture:
@@ -88,6 +95,7 @@ This project uses a Monorepo architecture:
 - [x] Configuration merging logic
 - [x] Unified support for HTTP Headers and Remote MCP
 - [x] GitHub CI/CD automation for cross-platform distribution
+- [x] Interactive `/launch` command with TUI
 - [ ] Secret Masking (Encrypted storage for API keys/tokens)
 - [ ] Unified session history collection and search
 - [ ] Multi-device sync (via iCloud/Dropbox)
