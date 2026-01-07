@@ -20,15 +20,23 @@ export class CodexAdapter implements ToolAdapter {
     for (const server of config.mcp_servers) {
       const toolSpecific = server.tool_specific?.[this.name] || {};
       
-      mcpServers[server.name] = {
-        type: server.type,
-        url: server.url,
-        headers: { ...(server.headers || {}), ...(toolSpecific.headers || {}) },
-        command: server.command,
-        args: server.args,
-        env: Object.keys(server.env).length > 0 ? server.env : undefined,
-        ...toolSpecific,
-      };
+      if (server.type === 'stdio') {
+        mcpServers[server.name] = {
+          type: 'stdio',
+          command: server.command,
+          args: server.args,
+          env: Object.keys(server.env).length > 0 ? server.env : undefined,
+          ...toolSpecific,
+        };
+      } else {
+        // Assume 'sse' or 'http' (remote)
+        mcpServers[server.name] = {
+          type: 'sse', 
+          url: server.url,
+          headers: { ...(server.headers || {}), ...(toolSpecific.headers || {}) },
+          ...toolSpecific,
+        };
+      }
     }
 
     return mcpServers;
