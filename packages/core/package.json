@@ -5,8 +5,10 @@
   "type": "module",
   "dependencies": {
     "@skitee3000/bun-pty": "^0.3.3",
+    "@types/fs-extra": "^11.0.4",
     "@xterm/addon-serialize": "^0.14.0",
     "@xterm/headless": "^6.0.0",
+    "fs-extra": "^11.3.3",
     "hono": "^4.0.0",
     "smol-toml": "^1.6.0",
     "uuid": "^13.0.0",

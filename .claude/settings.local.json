@@ -3,7 +3,10 @@
     "allow": [
       "Bash(rm:*)",
       "Bash(bun test-validation.ts)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "mcp__github__get_pull_request_files",
+      "mcp__github__get_pull_request_comments",
+      "mcp__github__get_pull_request_reviews"
     ]
   }
 }

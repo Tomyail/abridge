@@ -1,41 +1,53 @@
 #!/usr/bin/env bun
 import './polyfill';
-import { Command } from 'commander';
+import { showWelcomeScreen } from './welcome';
+import { program } from 'commander';
+import { version } from '../package.json';
+import { runInit, runApply, runImport, runStatus, runSyncPush, runSyncPull, runUi, runLaunch } from './actions';
+import { registry, ConfigLoader, DEFAULT_CONFIG_PATH, DaemonServer } from '@abridge/core';
+import fs from 'fs';
 
-import { showWelcomeScreen } from './welcome.js';
-import { runInit, runApply, runImport, runStatus, runSyncPush, runSyncPull, runUi } from './actions.js';
-
-const program = new Command();
+// const program = new Command(); // This line is removed as `program` is now imported directly.
 
 program
   .name('abridge')
   .description('Unified AI Tools Manager')
   .version('0.1.0')
   .action(async () => {
+    // Default action: Connect to daemon and show UI
+    // If we want the welcome screen to be "client-server" aware, we pass the client.
+    
+    // For now, let's keep the existing loop but use the DaemonClient inside `runUi` / `runLaunch`
+    // Or we could initialize the client here?
+    
     while (true) {
-      const action = await showWelcomeScreen();
-      
-      if (action.type === 'exit') {
-        process.exit(0);
-      }
+      const action = await showWelcomeScreen(); 
+      // ... same loop ...
       
       if (action.type === 'ui') {
         const { runUi } = await import('./actions.js');
         await runUi();
       }
-      
-      if (action.type === 'launch') {
-        const { runLaunch } = await import('./actions.js');
-        await runLaunch(action.toolId);
-        // Loop continues, showing welcome screen again
+
+      // ... match other actions ...
+      if (action.type === 'exit') {
+         process.exit(0);
       }
-      
-      if (action.type === 'run') {
-         // Handle other commands if migrated to return actions
-         // Currently welcome.tsx handles them directly for init/import etc.
-         // But we can migrate them here later for consistency.
+      if (action.type === 'launch') {
+         const { runLaunch } = await import('./actions.js');
+         await runLaunch(action.toolId);
       }
     }
+  });
+
+program
+  .command('daemon')
+  .description('Start the background process supervisor (Internal use)')
+  .action(async () => {
+      const { DaemonServer } = await import('@abridge/core');
+      const server = new DaemonServer();
+      server.start();
+      // Keep process alive
   });
 
 program

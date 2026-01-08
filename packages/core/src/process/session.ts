@@ -42,7 +42,13 @@ export class Session {
     // Hook into data flow
     this.pty.onData((data) => {
       this.term.write(data);
+      // We rely on ProcessManager hooking directly into pty.onData or we emit event?
+      // Since ProcessManager has access to session.pty, it can hook there.
+      // But let's expose a clean event.
     });
+
+    // Actually, Session implements event emitter? No.
+    // Let's just let ProcessManager hook into pty.onData via session.onData wrapper.
 
     this.pty.onExit(() => {
       this.metadata.status = 'idle';

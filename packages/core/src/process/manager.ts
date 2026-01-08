@@ -31,8 +31,23 @@ export class ProcessManager extends EventEmitter {
     const session = new Session(ptyProcess, command, args);
     this.sessions.set(session.id, session);
     
-    // Wire up resizing logic in session if needed, but session handles pty.resize
-    
+    // Throttle updates implementation
+    let pendingUpdate = false;
+    const scheduleUpdate = () => {
+        if (!pendingUpdate) {
+            pendingUpdate = true;
+            setTimeout(() => {
+                pendingUpdate = false;
+                this.emit('change', this.list());
+            }, 100); // 10fps updates for preview
+        }
+    };
+
+    // Listen for data to trigger updates
+    session.onData(() => {
+        scheduleUpdate();
+    });
+
     // Listen for session exit to update list
     session.pty.onExit(() => {
         this.emit('change', this.list());

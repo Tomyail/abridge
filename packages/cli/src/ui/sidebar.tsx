@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Box, Text } from 'ink';
-import { Session } from '@abridge/core';
+import type { SerializedSession } from '@abridge/core';
 
 interface SidebarProps {
-  sessions: Session[];
+  sessions: SerializedSession[];
   selectedIndex: number;
 }
 

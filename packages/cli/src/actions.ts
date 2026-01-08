@@ -1,13 +1,23 @@
 import chalk from 'chalk';
-import { ConfigLoader, DEFAULT_CONFIG_PATH, registry, mergeConfigs, SyncManager } from '@abridge/core';
+import { ConfigLoader, DEFAULT_CONFIG_PATH, registry, mergeConfigs, SyncManager, DaemonClient } from '@abridge/core';
 import React from 'react';
 import { render } from 'ink';
 import { App } from './ui/app.js';
 
-export async function runUi() {
+export async function runUi(initialTool?: string) {
     console.clear();
     const config = await ConfigLoader.load();
-    const { waitUntilExit } = render(React.createElement(App, { config }));
+    
+    // Connect to Daemon
+    const client = new DaemonClient();
+    try {
+        await client.connect();
+    } catch (e) {
+        console.error('Failed to connect to daemon:', e);
+        process.exit(1);
+    }
+    
+    const { waitUntilExit } = render(React.createElement(App, { config, client, initialTool }));
     await waitUntilExit();
 }
 
@@ -20,6 +30,12 @@ export async function runInit() {
     console.error(chalk.red('Failed to initialize configuration:'), error);
   }
 }
+
+// ... unchanged Apply/Import/Sync functions ...
+// I will keep them but snip for brevity in this replace block if possible, 
+// but since I'm replacing a large chunk I'll just keep them.
+// Wait, runApply etc don't need DaemonClient yet unless we want to run them via daemon?
+// For now they are file operations, so local is fine.
 
 export async function runApply() {
   try {
@@ -57,6 +73,7 @@ export async function runApply() {
     console.error(chalk.red('Failed to apply configuration:'), error);
   }
 }
+
 
 export async function runImport() {
   try {
@@ -145,17 +162,15 @@ export async function runLaunch(tool: string = 'claude-code') {
   console.clear(); 
   console.log(chalk.blue(`Launching ${tool}...`));
   
-  const adapters = registry.getAllAdapters();
-  const adapter = adapters.find(a => a.name === tool);
-
-  if (adapter && adapter.launch) {
-    try {
-        await adapter.launch();
-        console.clear(); 
-    } catch (e) {
-        console.error(chalk.red(`Failed to launch ${tool}`), e);
-    }
-  } else {
-    console.warn(chalk.yellow(`Tool ${tool} does not support launching or is not installed.`));
-  }
+  // NOTE: Ideally launch should attach to a session in the UI.
+  // But if run as `abridge launch`, maybe we just open the UI focused on that tool?
+  // Or we spawn it attached to stdio?
+  // Given the daemon architecture, `abridge launch` should probably just spawn the task in background
+  // and then exit, OR open the UI.
+  
+  // For now, let's just make it open the UI.
+  console.log(chalk.yellow('Opening UI...'));
+  
+  // TODO: We might want to pass "initialTool" to runUi to auto-spawn it.
+  await runUi(tool);
 }
