@@ -191,11 +191,11 @@ export const App = ({ config, client, initialTool }: AppProps) => {
       return;
     }
 
-    if (key.upArrow) {
+    if (key.upArrow || input === 'k') {
       setSelectedIndex(prev => Math.max(0, prev - 1));
     }
 
-    if (key.downArrow) {
+    if (key.downArrow || input === 'j') {
       setSelectedIndex(prev => (prev < sessions.length - 1 ? prev + 1 : 0));
     }
 
