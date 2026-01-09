@@ -23,7 +23,7 @@ describe("OpenCodeAdapter", () => {
     // OpenCode uses array command format
     expect(transformed["test-local"].type).toBe("local");
     expect(transformed["test-local"].command).toEqual(["node", "index.js"]);
-    expect(transformed["test-local"].env).toEqual({ DEBUG: "true" });
+    expect(transformed["test-local"].environment).toEqual({ DEBUG: "true" });
   });
 
   it("should transform unified config to OpenCode format (Remote)", () => {

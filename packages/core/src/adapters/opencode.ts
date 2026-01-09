@@ -19,21 +19,38 @@ export class OpenCodeAdapter implements ToolAdapter {
     for (const server of config.mcp_servers) {
       const toolSpecific = server.tool_specific?.[this.name] || {};
       
-      // OpenCode prefers array command format
       if (server.type === 'remote' || server.type === 'http' || toolSpecific.type === 'remote' || server.url) {
-        mcp[server.name] = {
+        const serverConfig: any = {
           type: 'remote',
           url: server.url || toolSpecific.url,
-          headers: { ...(server.headers || {}), ...(toolSpecific.headers || {}) },
-          ...toolSpecific,
         };
+
+        if (server.headers && Object.keys(server.headers).length > 0) {
+          serverConfig.headers = { ...server.headers };
+        }
+
+        // Only allow specific properties for remote
+        if (toolSpecific.enabled !== undefined) serverConfig.enabled = toolSpecific.enabled;
+        if (toolSpecific.timeout !== undefined) serverConfig.timeout = toolSpecific.timeout;
+        if (toolSpecific.oauth !== undefined) serverConfig.oauth = toolSpecific.oauth;
+
+        mcp[server.name] = serverConfig;
       } else {
-        mcp[server.name] = {
+        const serverConfig: any = {
           type: 'local',
           command: [server.command, ...(server.args || [])],
-          env: Object.keys(server.env).length > 0 ? server.env : undefined,
-          ...toolSpecific,
         };
+        
+        // OpenCode uses 'environment' not 'env'
+        if (server.env && Object.keys(server.env).length > 0) {
+          serverConfig.environment = server.env;
+        }
+
+        // Only allow specific properties for local
+        if (toolSpecific.enabled !== undefined) serverConfig.enabled = toolSpecific.enabled;
+        if (toolSpecific.timeout !== undefined) serverConfig.timeout = toolSpecific.timeout;
+        
+        mcp[server.name] = serverConfig;
       }
     }
 
@@ -75,7 +92,13 @@ export class OpenCodeAdapter implements ToolAdapter {
       };
 
       for (const [name, server] of Object.entries<any>(mcpServers)) {
+        const toolSpecific: any = {};
+        if (server.enabled !== undefined) toolSpecific.enabled = server.enabled;
+        if (server.timeout !== undefined) toolSpecific.timeout = server.timeout;
+
         if (server.type === 'remote') {
+          if (server.oauth !== undefined) toolSpecific.oauth = server.oauth;
+
           config.mcp_servers?.push({
             name,
             type: 'remote',
@@ -84,27 +107,18 @@ export class OpenCodeAdapter implements ToolAdapter {
             command: '',
             args: [],
             env: {},
-            tool_specific: {
-              [this.name]: Object.fromEntries(
-                Object.entries(server).filter(([key]) => !['type', 'url', 'headers'].includes(key))
-              )
-            }
+            tool_specific: { [this.name]: toolSpecific }
           });
         } else {
-          // Local server: command is often an array [cmd, ...args]
           const cmdArray = Array.isArray(server.command) ? server.command : [server.command];
           config.mcp_servers?.push({
             name,
-            type: 'stdio', // Map 'local' back to 'stdio' which is our internal default
+            type: 'stdio',
             command: cmdArray[0] || '',
             args: cmdArray.slice(1),
-            env: server.env || {},
-            headers: server.headers || {},
-            tool_specific: {
-              [this.name]: Object.fromEntries(
-                Object.entries(server).filter(([key]) => !['command', 'args', 'env', 'type', 'headers'].includes(key))
-              )
-            }
+            env: server.environment || server.env || {},
+            headers: {},
+            tool_specific: { [this.name]: toolSpecific }
           });
         }
       }
